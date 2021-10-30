@@ -1,5 +1,6 @@
 package br.com.franca;
 
+import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -36,6 +37,8 @@ public class PrimeiroTeste {
         int resultado = valor1+valor2;
 
         // verificação
-        Assert.assertEquals(valor1+valor2,resultado);
+        // Assert.assertEquals(valor1+valor2,resultado);
+        // utilizando assertj
+        Assertions.assertThat(resultado).isBetween(14,16);
     }
 }

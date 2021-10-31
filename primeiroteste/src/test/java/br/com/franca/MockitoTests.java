@@ -2,6 +2,8 @@ package br.com.franca;
 
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
+import org.mockito.InOrder;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 
 import java.util.ArrayList;
@@ -57,9 +59,26 @@ public class MockitoTests {
 
         // verificação
         /** Testando se o retorno do size é maior que zero, igual a 1 etc..*/
+
         Assertions.assertThat(size)
                 .isGreaterThan(0)
                 // .isEqualTo(1)
         ;
+
+        // Mockito.verify(myList).size(); // se foi executado se entrou em um if por exemplo...
+        // Mockito.verify(myList, Mockito.times(1)).size(); // se foi executado e quantas vezes
+        // Mockito.verify(myList, Mockito.never()).add(""); // se nunca foi executado se não entrou ou entrou em algum if por exemplo..
+
+    }
+
+    @Test
+    public void exempleInOrder(){
+        List <String> myList = Mockito.mock(List.class);
+        myList.add("");
+        myList.size();
+
+        InOrder inOrder = Mockito.inOrder(myList);
+        inOrder.verify(myList).add("");
+        inOrder.verify(myList).size();
     }
 }

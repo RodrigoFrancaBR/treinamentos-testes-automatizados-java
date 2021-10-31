@@ -13,33 +13,31 @@ public class PeopleService {
     private PeopleRepository repository;
 
     public void save(People people) {
+
         if (isInValidPeople(people)){
             throw new InvalidPeopleException("Invalid People");
         };
+
         repository.save(people);
     }
 
-    public People find(Long id) {
-        return repository.find(id);
-    }
-
-    private boolean isInValidPeople(People people) {
-        if (people.getName()==null || people.getName().isEmpty()
-                || people.getName().isBlank() || people.getName().length()<1){
-            return  true;
-        }
-        return  false;
+    public People findByCpf(String cpf) {
+        return repository.findByCpf(cpf);
     }
 
     public List<People> findAll() {
         return repository.findAll();
     }
 
-    public void delete(Long id) {
-        People people = find(id);
-        if (people==null){
-            throw new PeopleNotFoundException("People not found");
+    public void delete(String cpf) {
+        repository.delete(cpf);
+    }
+
+    private boolean isInValidPeople(People people) {
+        if (people==null || people.getName()==null || people.getName().isEmpty()
+                || people.getName().isBlank() || people.getName().length()<1){
+            return  true;
         }
-        repository.delete(id);
+        return  false;
     }
 }

@@ -6,8 +6,10 @@ import br.com.franca.exception.PeopleNotFoundException;
 import br.com.franca.repository.PeopleRepository;
 import br.com.franca.service.PeopleService;
 import org.assertj.core.api.Assertions;
-import org.junit.Before;
-import org.junit.Test;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 public class PessoaServiceTest {
 
@@ -15,7 +17,7 @@ public class PessoaServiceTest {
     private PeopleService peopleService;
     private PeopleRepository peopleRepository;
 
-    @Before
+    @BeforeEach
     public void setup(){
         // cenário
         peopleRepository = new PeopleRepository();
@@ -26,7 +28,8 @@ public class PessoaServiceTest {
     // antes de testar um cenário que salva uma pessoa com sucesso,
     // primeiro precisamos de um repositorio de pessoas vazio.
     @Test
-    public void createPeopleRepository_shouldCreateRepositoryEmpty_whenStart(){
+    @DisplayName("Should create empty repository when repository is not empty")
+    public void createRepository_shouldCreateRepositoryEmpty_whenIsNotEmpty(){
         // verificação
         Assertions
                 .assertThat(peopleRepository.getRepository())
@@ -34,7 +37,8 @@ public class PessoaServiceTest {
     }
 
     @Test
-    public void save_shouldSavePeople_whenValidPeople(){
+    @DisplayName("Should save people when a people is valid")
+    public void save_shouldSave_whenAPeopleIsValid(){
         // execução
         peopleService.save(people);
         //verificacao
@@ -46,31 +50,35 @@ public class PessoaServiceTest {
                 .containsKey(1l);
     }
 
-    @Test(expected = InvalidPeopleException.class)
-    public void exceptionSave_shouldThrowException_whenInvalidPeople(){
-        // execução
-        peopleService.save(new People());
+    // @Test(expected = InvalidPeopleException.class)
+    @Test
+    @DisplayName("Should throw exception when is not valid people")
+    public void exceptionSave_shouldThrowException_whenIsNotValidPeople(){
+        // cenário
+        this.people = null;
+        // execução verificação
+        org.junit.jupiter.api.Assertions.assertThrows(InvalidPeopleException.class, ()-> peopleService.save(people));
     }
 
     @Test
+    @DisplayName("Should delete when repository is not empty")
     public void delete_shouldRemovePeople_whenRepositoryIsNotEmpty(){
         //cenário
         peopleService.save(people);
         // execucao
-        peopleService.delete(1l);
+        peopleService.delete(people.getCpf());
         // verificação
         Assertions.assertThat(peopleRepository.getRepository())
                 .isEmpty();
     }
 
-    @Test(expected = PeopleNotFoundException.class)
+    @Test
+    @DisplayName("should throw exception when not people to delete")
     public void exceptionDelete_shouldThrowException_whenNoPeopleToDelete(){
         //cenário
-        peopleService.save(people);
-        // execução
-        peopleService.delete(2l);
-        // verificação
-
+        people.setCpf("78945612378");
+        // execução verificação
+        org.junit.jupiter.api.Assertions.assertThrows(PeopleNotFoundException.class, ()->peopleService.delete(people.getCpf()));
     }
 
     public People buildPeople() {

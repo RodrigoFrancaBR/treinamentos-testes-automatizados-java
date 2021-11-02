@@ -21,9 +21,9 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 @ExtendWith(SpringExtension.class) // cria um mini contexto com injeção de dependencia para executar os testes
 public class BookControllerTest {
 
-    /** 1 - definir a api que será consumida
-     * 2 - definir um construtor de requisicoes fake
-     * 3 - definir o verbo e informar a uri
+    /** 1 - Definir a URI que será consumida
+     * 2 - Definir um método com um construtor de requisicoes fake (MockMvcRequestBuilder)
+     * 3 - Chamar o método conforme o verbo http da chamada (get, post, delete etc..) passando a URI
      * 4 - definir cabeçalhos
      * 5 - definir um conteudo da requisição
     */

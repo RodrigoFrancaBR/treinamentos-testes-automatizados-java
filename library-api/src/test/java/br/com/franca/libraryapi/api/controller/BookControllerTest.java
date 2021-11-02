@@ -1,13 +1,19 @@
 package br.com.franca.libraryapi.api.controller;
 
 import br.com.franca.libraryapi.api.dto.BookDTO;
+import br.com.franca.libraryapi.model.entity.Book;
+import br.com.franca.libraryapi.service.BookService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
+import org.mockito.BDDMockito;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -33,16 +39,29 @@ public class BookControllerTest {
     @Autowired
     MockMvc mockMvc; //simula uma requisição
 
+    @MockBean
+    BookService service; // cria uma instancia mockada da interface BookService
+    // e injeta no contexto trazido pelo @ExtendWith(SpringExtension.class)
+
     @Test
     @DisplayName("Should save book When book is valid")
     public void saveBookTest() throws Exception {
         // cenário
         BookDTO bookDTO = BookDTO.builder()
-                .id(1l)
                 .title("As aventuras")
                 .author("Artur")
                 .isbn("123456")
                 .build();
+
+        Book saveBook = Book.builder()
+                .id(10l)
+                .title("As aventuras")
+                .author("Artur")
+                .isbn("123456")
+                .build();
+
+        BDDMockito.given(service.save(Mockito.any(Book.class)))
+                .willReturn(saveBook);
 
         String json = new ObjectMapper().writeValueAsString(bookDTO);
 
@@ -57,7 +76,6 @@ public class BookControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("title").value(bookDTO.getTitle()))
                 .andExpect(MockMvcResultMatchers.jsonPath("author").value(bookDTO.getAuthor()))
                 .andExpect(MockMvcResultMatchers.jsonPath("isbn").value(bookDTO.getIsbn()));
-
     }
 
     @Test

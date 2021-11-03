@@ -21,13 +21,12 @@ public class BookController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public BookDTO save(@RequestBody BookDTO bookDTO){
+
       log.info("requesting POST: /api/books :: {}", bookDTO);
-
       Book book = modelMapper.map(bookDTO, Book.class);
-      book.setId(10l);
-
-      log.info("saving book :: {}", book);
-      Book saveBook = service.save(book);
+//
+//      log.info("saving book :: {}", book);
+//      Book saveBook = service.save(book);
 
       BookDTO saveBookDTO = modelMapper.map(book, BookDTO.class);
 

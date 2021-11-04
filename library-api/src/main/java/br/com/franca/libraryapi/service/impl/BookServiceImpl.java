@@ -3,18 +3,17 @@ package br.com.franca.libraryapi.service.impl;
 import br.com.franca.libraryapi.model.entity.Book;
 import br.com.franca.libraryapi.repository.BookRepository;
 import br.com.franca.libraryapi.service.BookService;
-import org.springframework.stereotype.Repository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+@RequiredArgsConstructor
 @Service
-public class BookServiceImpl {// implements BookService {
+public class BookServiceImpl  implements BookService {
 
-    private BookRepository repository;
+    private final BookRepository repository;
 
-    // @Override
+    @Override
     public Book save(Book book) {
-//        book.setId(2l);
-//        return book;
         return repository.save(book);
     }
 }

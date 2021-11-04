@@ -24,11 +24,11 @@ public class BookController {
 
       log.info("requesting POST: /api/books :: {}", bookDTO);
       Book book = modelMapper.map(bookDTO, Book.class);
-//
-//      log.info("saving book :: {}", book);
-//      Book saveBook = service.save(book);
 
-      BookDTO saveBookDTO = modelMapper.map(book, BookDTO.class);
+      log.info("saving book :: {}", book);
+      Book saveBook = service.save(book);
+
+      BookDTO saveBookDTO = modelMapper.map(saveBook, BookDTO.class);
 
       return saveBookDTO;
 

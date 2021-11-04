@@ -23,6 +23,11 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import static br.com.franca.libraryapi.helper.mock.MockHelper.oneBookDtoIn;
+import static br.com.franca.libraryapi.helper.mock.MockHelper.oneBookDtoOut;
+import static org.mockito.ArgumentMatchers.any;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
 @AutoConfigureMockMvc // disponibiliza um objeto para fazer requisicções
 @WebMvcTest //
 @ActiveProfiles("test") // quero rodar os testes com o profile test
@@ -48,7 +53,7 @@ public class BookControllerTest {
      *  usar um mapper para converter dto para entidade e depois a entidade para dto novamente.
      *  retornar o dto baseado no cenário de teste acima.
      *  10 Rodar testes e ver falhar pois o dto de retorno é identico ao dto de entrada,
-     *  e não possui um id preenchido.
+     *  não possui um id preenchido.
      * 11 - Simular uma chamada do método save da classe de servico
      * que recebe como parametro qualquer coisa (não importa o argumento nesse momento)
      * mas retorne uma entidade com id preenchido (BDDMockito.given).
@@ -56,7 +61,7 @@ public class BookControllerTest {
      * 13 - Criar uma interface com método save conforme cenário acima.
      * 15 - Injetar o servico no controller e delegar para o service a entidade ou o DTO
      * fazer o mapper do DTO na controlle ou no service...
-     *
+     * 16 - Rodar teste e ver passar.
      */
 
     static String URI = "/api/books/";
@@ -80,10 +85,10 @@ public class BookControllerTest {
     public void saveBookTest() throws Exception {
 
         // cenário
-        BookDTO bookDtoIn = MockHelper.oneBookDtoIn();
+        BookDTO bookDtoIn = oneBookDtoIn();
         String json = new ObjectMapper().writeValueAsString(bookDtoIn);
 
-        BookDTO saveBookDTO = MockHelper.oneBookDtoOut();
+        BookDTO saveBookDTO = oneBookDtoOut();
         String jsonResponse = new ObjectMapper().writeValueAsString(saveBookDTO);
 
         /**
@@ -96,7 +101,7 @@ public class BookControllerTest {
          */
 
         Book saveBook = MockHelper.oneBook();
-        BDDMockito.given(service.save(ArgumentMatchers.any()))
+        BDDMockito.given(service.save(any()))
                 .willReturn(saveBook);
 
         // execução verificação
@@ -106,20 +111,19 @@ public class BookControllerTest {
                 .content(json);
 
         mockMvc.perform(request)
-                .andExpect(MockMvcResultMatchers.status().isCreated())
-                .andExpect(MockMvcResultMatchers.content().json(jsonResponse))
-                .andExpect(MockMvcResultMatchers.jsonPath("id").isNotEmpty())
-
-                .andExpect(MockMvcResultMatchers.jsonPath("id").value(saveBookDTO.getId()))
-                .andExpect(MockMvcResultMatchers.jsonPath("title").value(saveBookDTO.getTitle()))
-                .andExpect(MockMvcResultMatchers.jsonPath("author").value(saveBookDTO.getAuthor()))
-                .andExpect(MockMvcResultMatchers.jsonPath("isbn").value(saveBookDTO.getIsbn()))
+                .andExpect(status().isCreated())
+                .andExpect(content().json(jsonResponse))
+                .andExpect(jsonPath("id").value(saveBookDTO.getId()))
+                .andExpect(jsonPath("title").value(saveBookDTO.getTitle()))
+                .andExpect(jsonPath("author").value(saveBookDTO.getAuthor()))
+                .andExpect(jsonPath("isbn").value(saveBookDTO.getIsbn()))
 
                 // informações que vem do saveBookDTO
-                .andExpect(MockMvcResultMatchers.jsonPath("id").value(1l))
-                .andExpect(MockMvcResultMatchers.jsonPath("title").value("As aventuras"))
-                .andExpect(MockMvcResultMatchers.jsonPath("author").value("Artur"))
-                .andExpect(MockMvcResultMatchers.jsonPath("isbn").value("123456"));
+                .andExpect(jsonPath("id").value(1l))
+                .andExpect(jsonPath("title").value("As aventuras"))
+                .andExpect(jsonPath("author").value("Artur"))
+                .andExpect(jsonPath("isbn").value("123456"));
+
     }
 
     @Test

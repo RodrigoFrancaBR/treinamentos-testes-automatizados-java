@@ -1,31 +1,33 @@
 package br.com.franca.libraryapi.api.controller;
 
 import br.com.franca.libraryapi.api.dto.BookDTO;
+import br.com.franca.libraryapi.api.exception.ApiErrors;
 import br.com.franca.libraryapi.helper.mock.MockHelper;
 import br.com.franca.libraryapi.model.entity.Book;
 import br.com.franca.libraryapi.service.BookService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentMatchers;
 import org.mockito.BDDMockito;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import static br.com.franca.libraryapi.helper.mock.MockHelper.oneBookDtoIn;
 import static br.com.franca.libraryapi.helper.mock.MockHelper.oneBookDtoOut;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @AutoConfigureMockMvc // disponibiliza um objeto para fazer requisicções
@@ -71,6 +73,7 @@ public class BookControllerTest {
 
     @MockBean
     BookService service;
+    private String errors;
 
     /**
      cria uma instancia mockada da interface BookService,
@@ -101,11 +104,12 @@ public class BookControllerTest {
          */
 
         Book saveBook = MockHelper.oneBook();
+
         BDDMockito.given(service.save(any()))
                 .willReturn(saveBook);
 
         // execução verificação
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post(URI)
+        MockHttpServletRequestBuilder request = post(URI)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(json);
@@ -128,6 +132,33 @@ public class BookControllerTest {
 
     @Test
     @DisplayName("Should throw exception When save invalid book")
-    public void saveInvalidBookTest(){
+    public void saveInvalidBookTest() throws Exception {
+        // cenário
+        BookDTO bookDTOIn = new BookDTO();
+        String jsonRequest = new ObjectMapper().writeValueAsString(bookDTOIn);
+
+        MockHttpServletResponse response = mockMvc.perform(post(URI)
+                        .content(jsonRequest)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                ).andReturn().getResponse();
+
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.getContentAsString()).contains("errors");
+        // Assertions.assertThat(response.getContentAsString()).isEqualTo("{\"errors\":[\"must not be empty\",\"must not be empty\",\"must not be empty\"]}");
     }
+
+    /**
+        fazer uma requisição passando um dto vazio
+        validar se retorna 404
+        rodar teste e ver falhar por conta do mapper, não vai ser possível
+       converter obj dto null para obj entidade
+        implemar a expecificação bean validations no DTO
+        (pom) anotaçoes no DTO e @valid no parâmetro do método da controller
+     rodar teste e ver passar.
+     validar se está retornando além do status 404 um erro customizado
+     criar um centralizador de exception para capturar todas as exceptios
+     e retornar um erro customizado
+     *
+     */
 }

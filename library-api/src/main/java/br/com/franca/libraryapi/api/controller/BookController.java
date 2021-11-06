@@ -9,6 +9,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 @RequiredArgsConstructor
 @Slf4j
 @RestController
@@ -20,7 +22,7 @@ public class BookController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public BookDTO save(@RequestBody BookDTO bookDTO){
+    public BookDTO save(@RequestBody @Valid BookDTO bookDTO){
 
       log.info("requesting POST: /api/books :: {}", bookDTO);
       Book book = modelMapper.map(bookDTO, Book.class);

@@ -1,4 +1,4 @@
-package br.com.franca.libraryapi.config;
+package br.com.franca.libraryapi.api.exception;
 
 import br.com.franca.libraryapi.api.exception.ApiErrors;
 import br.com.franca.libraryapi.exception.BusinessException;

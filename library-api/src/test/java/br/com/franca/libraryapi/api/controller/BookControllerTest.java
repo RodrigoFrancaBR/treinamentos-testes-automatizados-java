@@ -31,8 +31,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.InstanceOfAssertFactories.map;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -156,16 +155,16 @@ public class BookControllerTest {
 
         assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(response.getContentAsString()).contains("errors");
-        Mockito.verify(mapper, times(0)).map(any(),any());
-        Mockito.verify(service, times(0)).save(any());
+        Mockito.verify(mapper, never()).map(any(),any());
+        Mockito.verify(service, never()).save(any());
 
     // Assertions.assertThat(response.getContentAsString()).isEqualTo("{\"errors\":[\"must not be empty\",\"must not be empty\",\"must not be empty\"]}");
     }
 
+    // depois de simular um erro de negócio é hora de criar esse cenário na camada de servico
     @DisplayName("should throw exception when isbn in use by another book")
     @Test
     public void saveBookWithDuplicatedIsbn () throws Exception {
-        // cenário
         BookDTO bookDTO = MockHelper.oneBookDTO();
         bookDTO.setIsbn("123");
         String jsonRequest = new ObjectMapper().writeValueAsString(bookDTO);
@@ -177,7 +176,6 @@ public class BookControllerTest {
         String errorMenssage = "isbn already registered";
         given(service.save(Mockito.any(Book.class))).willThrow(new BusinessException(errorMenssage));
 
-        // execução verificação
         MockHttpServletRequestBuilder request = post(URI)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)

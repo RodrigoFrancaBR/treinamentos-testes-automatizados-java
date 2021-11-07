@@ -16,6 +16,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @Profile("test")
@@ -53,13 +54,13 @@ public class BookServiceTest {
     @DisplayName("Should save book when it is valid")
     @Test
     public void saveBookTest(){
+        Book book = MockHelper.oneBook();
 
-        // cenário
-        Book bookIn = MockHelper.oneBook();
         Book saveBookDataBase = MockHelper.oneBook();
-        Mockito.when(repository.save(any())).thenReturn(saveBookDataBase);
-        // execução
-        Book saveBook = service.save(bookIn);
+        saveBookDataBase.setId(1L);
+        when(repository.save(any(Book.class))).thenReturn(saveBookDataBase);
+
+        Book saveBook = service.save(book);
 
         // verificação
         assertThat(saveBook).isEqualTo(saveBookDataBase);

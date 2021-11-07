@@ -13,14 +13,13 @@ public class MockHelper {
 
     public static Book oneBook(){
         return Book.builder()
-                .id(1l)
                 .title("As aventuras")
                 .author("Artur")
                 .isbn("123456")
                 .build();
     }
 
-    public static BookDTO oneBookDtoIn(){
+    public static BookDTO oneBookDTO(){
         return BookDTO.builder()
                 .title("As aventuras")
                 .author("Artur")
@@ -28,11 +27,6 @@ public class MockHelper {
                 .build();
     }
 
-    public static BookDTO oneBookDtoOut(){
-        BookDTO bookDtoOut = oneBookDtoIn();
-        bookDtoOut.setId(1L);
-        return  bookDtoOut;
-    }
 
 //    public static ApiErrors oneApiErros() {
 //        FildError errorAuthor = new FildError("author", "must not be empty");

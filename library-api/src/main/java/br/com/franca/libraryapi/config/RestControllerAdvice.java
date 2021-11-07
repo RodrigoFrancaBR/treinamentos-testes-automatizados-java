@@ -1,6 +1,7 @@
 package br.com.franca.libraryapi.config;
 
 import br.com.franca.libraryapi.api.exception.ApiErrors;
+import br.com.franca.libraryapi.exception.BusinessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -16,5 +17,13 @@ public class RestControllerAdvice {
 //        return new ApiErrors(exception.getBindingResult().getFieldErrors());
 //        return new ApiErrors(exception.getBindingResult().getAllErrors());
         return new ApiErrors(exception.getBindingResult());
+    }
+
+    @ResponseStatus(code = HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(BusinessException.class)
+    public ApiErrors handBusinessException (BusinessException exception){
+//        return new ApiErrors(exception.getBindingResult().getFieldErrors());
+//        return new ApiErrors(exception.getBindingResult().getAllErrors());
+        return new ApiErrors(exception);
     }
 }

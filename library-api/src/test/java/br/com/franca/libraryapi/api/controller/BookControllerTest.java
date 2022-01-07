@@ -1,6 +1,6 @@
 package br.com.franca.libraryapi.api.controller;
 
-import br.com.franca.libraryapi.api.service.BookService;
+import br.com.franca.libraryapi.api.service.IBookService;
 import br.com.franca.libraryapi.domain.model.Book;
 import br.com.franca.libraryapi.dto.BookDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -34,7 +34,7 @@ public class BookControllerTest {
     MockMvc mockMvc;
 
     @MockBean
-    BookService bookService;
+    IBookService bookService;
 
     @Test
     @DisplayName("Should create book when is valid")

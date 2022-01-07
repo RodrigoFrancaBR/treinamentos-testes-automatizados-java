@@ -1,5 +1,6 @@
 package br.com.franca.libraryapi.api.controller;
 
+import br.com.franca.libraryapi.dto.BookDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
@@ -32,8 +33,13 @@ public class BookControllerTest {
     @Test
     @DisplayName("Should create book when is valid")
     public void createBook_shouldCreateBookWhenIsValid() throws Exception {
+        BookDTO bookDTO = BookDTO.builder()
+                .title("Meu Livro")
+                .author("Autor")
+                .isbn("121212")
+                .build();
 
-        String json = new ObjectMapper().writeValueAsString(null);
+        String json = new ObjectMapper().writeValueAsString(bookDTO);
 
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.post(URI)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)

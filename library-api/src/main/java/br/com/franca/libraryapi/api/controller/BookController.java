@@ -3,8 +3,8 @@ package br.com.franca.libraryapi.api.controller;
 import br.com.franca.libraryapi.api.service.BookService;
 import br.com.franca.libraryapi.domain.model.Book;
 import br.com.franca.libraryapi.dto.BookDTO;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -12,20 +12,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/books")
 public class BookController {
 
-    @Autowired
-    BookService bookService;
+    private final BookService bookService;
 
-    @Autowired
-    ModelMapper mapper;
-
-    public BookController(BookService bookService, ModelMapper mapper) {
-        this.bookService = bookService;
-        this.mapper = mapper;
-    }
+    private final ModelMapper mapper;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)

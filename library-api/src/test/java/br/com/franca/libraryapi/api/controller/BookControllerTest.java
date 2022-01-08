@@ -41,8 +41,8 @@ public class BookControllerTest {
     IBookService bookService;
 
     @Test
-    @DisplayName("Should create book when is valid")
-    public void createBook_shouldCreateBookWhenIsValid() throws Exception {
+    @DisplayName("Should save book when is valid")
+    public void save_shouldSaveBookWhenIsValid() throws Exception {
 
         String json = MockHelper.of(MockHelper.oneBookDTO());
 
@@ -65,8 +65,8 @@ public class BookControllerTest {
     }
 
     @Test
-    @DisplayName("Should throw exception when book is invalid")
-    public void createInvalidBook_shouldThrowExceptionWhenIsInvalid() throws Exception {
+    @DisplayName("Should throw exception when is invalid book")
+    public void save_shouldThrowExceptionWhenIsInvalidBook() throws Exception {
         String json = MockHelper.of(new BookDTO());
 
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.post(URI)
@@ -81,8 +81,8 @@ public class BookControllerTest {
     }
 
     @Test
-    @DisplayName("Should throw exception when isbn is duplicate")
-    public void createInvalidBook_shouldThrowExceptionWhenIsbnDuplicate() throws Exception {
+    @DisplayName("Should throw exception when isbn already registered")
+    public void save_shouldThrowExceptionWhenIsbnAlreadyRegistered() throws Exception {
 
         MessageError messageError = new MessageError("isbn", "The field isbn already registered");
 

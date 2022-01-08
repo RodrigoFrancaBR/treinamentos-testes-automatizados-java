@@ -25,7 +25,7 @@ public class BookController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public BookDTO createBook(@RequestBody @Valid BookDTO dto) {
+    public BookDTO save(@RequestBody @Valid BookDTO dto) {
 
         Book book = mapper.map(dto, Book.class);
 

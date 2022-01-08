@@ -1,15 +1,18 @@
 package br.com.franca.libraryapi.domain;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.validation.FieldError;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@NoArgsConstructor
 @Data
 public class ApiError {
 
-    private final List<MessageError> errors;
+    private List<MessageError> errors;
 
     public ApiError(List<FieldError> fieldErrors) {
         this.errors = fieldErrors
@@ -17,5 +20,9 @@ public class ApiError {
                 .map(e -> new MessageError(e.getField(),
                         "The field " + e.getField() + " " + e.getDefaultMessage()))
                 .collect(Collectors.toList());
+    }
+
+    public ApiError(MessageError messageError) {
+        this.errors = Arrays.asList(messageError);
     }
 }

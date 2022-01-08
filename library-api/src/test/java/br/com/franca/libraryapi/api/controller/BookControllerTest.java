@@ -1,8 +1,11 @@
 package br.com.franca.libraryapi.api.controller;
 
+import br.com.franca.libraryapi.api.helper.MockHelper;
 import br.com.franca.libraryapi.api.service.IBookService;
+import br.com.franca.libraryapi.domain.MessageError;
 import br.com.franca.libraryapi.domain.model.Book;
 import br.com.franca.libraryapi.dtos.BookDTO;
+import br.com.franca.libraryapi.exception.BusinessException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -40,19 +43,10 @@ public class BookControllerTest {
     @Test
     @DisplayName("Should create book when is valid")
     public void createBook_shouldCreateBookWhenIsValid() throws Exception {
-        BookDTO bookDTO = BookDTO.builder()
-                .title("Meu Livro")
-                .author("Autor")
-                .isbn("121212")
-                .build();
 
-        String json = new ObjectMapper().writeValueAsString(bookDTO);
+        String json = MockHelper.of(MockHelper.oneBookDTO());
 
-        Book savedBook = Book.builder().id(1l)
-                .title("Meu Livro")
-                .author("Autor")
-                .isbn("121212")
-                .build();
+        Book savedBook = MockHelper.oneBook();
 
         given(bookService.save(Mockito.any(Book.class)))
                 .willReturn(savedBook);
@@ -65,15 +59,15 @@ public class BookControllerTest {
         mockMvc.perform(requestBuilder)
                 .andExpect(MockMvcResultMatchers.status().isCreated())
                 .andExpect(MockMvcResultMatchers.jsonPath("id").value(savedBook.getId()))
-                .andExpect(MockMvcResultMatchers.jsonPath("title").value("Meu Livro"))
-                .andExpect(MockMvcResultMatchers.jsonPath("author").value("Autor"))
-                .andExpect(MockMvcResultMatchers.jsonPath("isbn").value("121212"));
+                .andExpect(MockMvcResultMatchers.jsonPath("title").value(savedBook.getTitle()))
+                .andExpect(MockMvcResultMatchers.jsonPath("author").value(savedBook.getAuthor()))
+                .andExpect(MockMvcResultMatchers.jsonPath("isbn").value(savedBook.getIsbn()));
     }
 
     @Test
     @DisplayName("Should throw exception when book is invalid")
     public void createInvalidBook_shouldThrowExceptionWhenIsInvalid() throws Exception {
-        String json = new ObjectMapper().writeValueAsString(new BookDTO());
+        String json = MockHelper.of(new BookDTO());
 
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.post(URI)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -83,9 +77,28 @@ public class BookControllerTest {
         mockMvc.perform(requestBuilder)
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andExpect(MockMvcResultMatchers.jsonPath("errors", hasSize(3)));
-//                .andExpect(MockMvcResultMatchers.jsonPath("title").value("Meu Livro"))
-//                .andExpect(MockMvcResultMatchers.jsonPath("author").value("Autor"))
-//                .andExpect(MockMvcResultMatchers.jsonPath("isbn").value("121212"));
+
+    }
+
+    @Test
+    @DisplayName("Should throw exception when isbn is duplicate")
+    public void createInvalidBook_shouldThrowExceptionWhenIsbnDuplicate() throws Exception {
+
+        MessageError messageError = new MessageError("isbn", "The field isbn already registered");
+
+        given(bookService.save(Mockito.any(Book.class)))
+                .willThrow(new BusinessException(messageError));
+
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.post(URI)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(MockHelper.of(MockHelper.oneBookDTO()));
+
+        mockMvc.perform(requestBuilder)
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("errors", hasSize(1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("errors[0].field").value(messageError.getField()))
+                .andExpect(MockMvcResultMatchers.jsonPath("errors[0].message").value(messageError.getMessage()));
 
     }
 }

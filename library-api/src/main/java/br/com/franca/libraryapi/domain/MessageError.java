@@ -5,11 +5,15 @@ import lombok.Data;
 @Data
 public class MessageError {
 
-    private final String field;
-    private final String message;
+    private String field;
+    private String message;
 
     public MessageError(String field, String message) {
         this.field = field;
         this.message = message;
+    }
+
+    public MessageError(String messageError) {
+        this.message = messageError;
     }
 }

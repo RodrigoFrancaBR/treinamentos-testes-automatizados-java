@@ -2,7 +2,7 @@ package br.com.franca.libraryapi.api.controller;
 
 import br.com.franca.libraryapi.api.service.IBookService;
 import br.com.franca.libraryapi.domain.model.Book;
-import br.com.franca.libraryapi.dto.BookDTO;
+import br.com.franca.libraryapi.dtos.BookDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,6 +20,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.BDDMockito.given;
 
 @ActiveProfiles("test")
@@ -71,7 +72,20 @@ public class BookControllerTest {
 
     @Test
     @DisplayName("Should throw exception when book is invalid")
-    public void createInvalidBook_shouldThrowExceptionWhenIsInvalid() {
+    public void createInvalidBook_shouldThrowExceptionWhenIsInvalid() throws Exception {
+        String json = new ObjectMapper().writeValueAsString(new BookDTO());
+
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.post(URI)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(json);
+
+        mockMvc.perform(requestBuilder)
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("errors", hasSize(3)));
+//                .andExpect(MockMvcResultMatchers.jsonPath("title").value("Meu Livro"))
+//                .andExpect(MockMvcResultMatchers.jsonPath("author").value("Autor"))
+//                .andExpect(MockMvcResultMatchers.jsonPath("isbn").value("121212"));
 
     }
 }

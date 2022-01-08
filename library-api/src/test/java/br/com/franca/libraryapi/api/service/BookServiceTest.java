@@ -1,8 +1,9 @@
 package br.com.franca.libraryapi.api.service;
 
 import br.com.franca.libraryapi.domain.model.Book;
-import br.com.franca.libraryapi.domain.repository.IBookRepository;
+import br.com.franca.libraryapi.repository.IBookRepository;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,8 +17,12 @@ public class BookServiceTest {
     @MockBean
     IBookRepository repository;
 
-    @MockBean
     IBookService bookService;
+
+    @BeforeEach
+    public void setup() {
+        this.bookService = new BookService(repository);
+    }
 
     @DisplayName("Should save book when is valid")
     @Test

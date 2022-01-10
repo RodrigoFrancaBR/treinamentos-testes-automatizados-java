@@ -26,6 +26,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.util.Comparator;
 import java.util.List;
 
 
@@ -220,7 +221,9 @@ public class BookControllerTest {
     }
 
     private void sort(List<MessageError> errors) {
-        errors.sort((e1, e2) -> e1.getField().compareTo(e2.getField()));
+        errors.sort(Comparator.comparing(MessageError::getField));
+        // errors.sort(Comparator.comparing(e->e.getField()));
+        // errors.sort((e1, e2) -> e1.getField().compareTo(e2.getField()));
     }
 
     /**

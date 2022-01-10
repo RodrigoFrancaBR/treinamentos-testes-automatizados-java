@@ -19,7 +19,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -48,29 +47,19 @@ public class BookControllerTest {
     @DisplayName("Should save book when is valid")
     public void save_shouldSaveBookWhenIsValid() throws Exception {
 
-        BookDTO bookDTORequest = MockHelper.oneBookDTO();
+        var bookDTORequest = MockHelper.oneBookDTO();
 
         String request = MockHelper.of(bookDTORequest);
 
-        BookDTO savedBookDTO = MockHelper.savedBookDTO();
-
         BDDMockito.given(bookService.save(Mockito.any(BookDTO.class)))
-                .willReturn(savedBookDTO);
+                .willReturn(MockHelper.savedBookDTO());
 
-        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.post(URI)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(request);
+        var requestBuilder = getRequestBuilder(request);
 
-        MockHttpServletResponse response = mockMvc.perform(requestBuilder).andReturn().getResponse();
-        BookDTO bookDTOResponse = (BookDTO) MockHelper.of(response.getContentAsString(), BookDTO.class);
+        var response = mockMvc.perform(requestBuilder).andReturn().getResponse();
 
         Assertions.assertThat(response.getStatus()).isEqualTo(HttpStatus.CREATED.value());
-        Assertions.assertThat(bookDTOResponse.getId()).isNotNull();
-        Assertions.assertThat(bookDTOResponse).isEqualTo(savedBookDTO);
-        Assertions.assertThat(bookDTOResponse.getTitle()).isEqualTo(bookDTORequest.getTitle());
-        Assertions.assertThat(bookDTOResponse.getAuthor()).isEqualTo(bookDTORequest.getAuthor());
-        Assertions.assertThat(bookDTOResponse.getIsbn()).isEqualTo(bookDTORequest.getIsbn());
+        Assertions.assertThat(response.getHeader("Location").contains("books/1"));
 
         Mockito.verify(bookService, Mockito.times(1))
                 .save(Mockito.any(BookDTO.class));
@@ -82,18 +71,18 @@ public class BookControllerTest {
 
         String request = MockHelper.of(new BookDTO());
 
-        ApiError apiErrorExpected = new ApiError(
+        var apiErrorExpected = new ApiError(
                 new MessageError("title", "The field title must not be blank"),
                 new MessageError("author", "The field author must not be blank"),
                 new MessageError("isbn", "The field isbn must not be blank"));
 
         sort(apiErrorExpected.getErrors());
 
-        MockHttpServletRequestBuilder requestBuilder = getRequestBuilder(request);
+        var requestBuilder = getRequestBuilder(request);
 
-        MockHttpServletResponse response = mockMvc.perform(requestBuilder).andReturn().getResponse();
+        var response = mockMvc.perform(requestBuilder).andReturn().getResponse();
 
-        ApiError apiErrorResponse = (ApiError) MockHelper.of(response.getContentAsString(), ApiError.class);
+        var apiErrorResponse = (ApiError) MockHelper.of(response.getContentAsString(), ApiError.class);
 
         sort(apiErrorResponse.getErrors());
 
@@ -110,17 +99,17 @@ public class BookControllerTest {
     @DisplayName("Should throw exception when title is blank ")
     public void save_shouldThrowExceptionWhenTitleIsBlank() throws Exception {
 
-        BookDTO bookDTO = MockHelper.oneBookDTO();
+        var bookDTO = MockHelper.oneBookDTO();
         bookDTO.setTitle("");
 
         String request = MockHelper.of(bookDTO);
 
-        ApiError apiErrorExpected = new ApiError(
+        var apiErrorExpected = new ApiError(
                 new MessageError("title", "The field title must not be blank"));
 
-        MockHttpServletRequestBuilder requestBuilder = getRequestBuilder(request);
+        var requestBuilder = getRequestBuilder(request);
 
-        MockHttpServletResponse response = mockMvc.perform(requestBuilder).andReturn().getResponse();
+        var response = mockMvc.perform(requestBuilder).andReturn().getResponse();
 
         Assertions.assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
 
@@ -129,7 +118,7 @@ public class BookControllerTest {
         AssertionsForClassTypes.assertThat(response.getContentAsString()).isEqualTo(responseExpected);
 
         // converter o response em objeto java e comparar com o expected objeto java
-        ApiError apiErrorResponse = (ApiError) MockHelper.of(response.getContentAsString(), ApiError.class);
+        var apiErrorResponse = (ApiError) MockHelper.of(response.getContentAsString(), ApiError.class);
         Assertions.assertThat(apiErrorResponse.getErrors().size()).isEqualTo(apiErrorExpected.getErrors().size());
 
         Mockito.verify(bookService, Mockito.never())
@@ -140,18 +129,18 @@ public class BookControllerTest {
     @DisplayName("Should throw exception when author is blank ")
     public void save_shouldThrowExceptionWhenAuthorIsBlank() throws Exception {
 
-        BookDTO bookDTO = MockHelper.oneBookDTO();
+        var bookDTO = MockHelper.oneBookDTO();
         bookDTO.setAuthor("");
 
         String request = MockHelper.of(bookDTO);
 
-        ApiError apiErrorExpected = new ApiError(
+        var apiErrorExpected = new ApiError(
                 new MessageError("author", "The field author must not be blank"));
 
-        MockHttpServletRequestBuilder requestBuilder = getRequestBuilder(request);
+        var requestBuilder = getRequestBuilder(request);
 
-        MockHttpServletResponse response = mockMvc.perform(requestBuilder).andReturn().getResponse();
-        ApiError apiErrorResponse = (ApiError) MockHelper.of(response.getContentAsString(), ApiError.class);
+        var response = mockMvc.perform(requestBuilder).andReturn().getResponse();
+        var apiErrorResponse = (ApiError) MockHelper.of(response.getContentAsString(), ApiError.class);
 
         Assertions.assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         Assertions.assertThat(apiErrorResponse).isEqualTo(apiErrorExpected);
@@ -165,17 +154,17 @@ public class BookControllerTest {
     @DisplayName("Should throw exception when isbn is blank ")
     public void save_shouldThrowExceptionWhenIsbnIsBlank() throws Exception {
 
-        BookDTO bookDTO = MockHelper.oneBookDTO();
+        var bookDTO = MockHelper.oneBookDTO();
         bookDTO.setIsbn("");
 
         String request = MockHelper.of(bookDTO);
 
-        ApiError apiErrorExpected = new ApiError(
+        var apiErrorExpected = new ApiError(
                 new MessageError("isbn", "The field isbn must not be blank"));
 
-        MockHttpServletRequestBuilder requestBuilder = getRequestBuilder(request);
+        var requestBuilder = getRequestBuilder(request);
 
-        MockHttpServletResponse response = mockMvc.perform(requestBuilder).andReturn().getResponse();
+        var response = mockMvc.perform(requestBuilder).andReturn().getResponse();
         ApiError apiErrorResponse = (ApiError) MockHelper.of(response.getContentAsString(), ApiError.class);
 
         Assertions.assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -190,17 +179,17 @@ public class BookControllerTest {
     @DisplayName("Should throw exception when isbn already registered")
     public void save_shouldThrowExceptionWhenIsbnAlreadyRegistered() throws Exception {
 
-        ApiError apiErrorExpected = new ApiError(
+        var apiErrorExpected = new ApiError(
                 new MessageError("isbn", "The field isbn already registered"));
 
         BDDMockito.given(bookService.save(Mockito.any(BookDTO.class)))
                 .willThrow(new BusinessException(apiErrorExpected.getErrors().get(0)));
 
-        MockHttpServletRequestBuilder requestBuilder = getRequestBuilder(MockHelper.of(MockHelper.oneBookDTO()));
+        var requestBuilder = getRequestBuilder(MockHelper.of(MockHelper.oneBookDTO()));
 
-        MockHttpServletResponse response = mockMvc.perform(requestBuilder).andReturn().getResponse();
+        var response = mockMvc.perform(requestBuilder).andReturn().getResponse();
 
-        ApiError apiErrorResponse = (ApiError) MockHelper.of(response.getContentAsString(), ApiError.class);
+        var apiErrorResponse = (ApiError) MockHelper.of(response.getContentAsString(), ApiError.class);
 
         Assertions.assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
 

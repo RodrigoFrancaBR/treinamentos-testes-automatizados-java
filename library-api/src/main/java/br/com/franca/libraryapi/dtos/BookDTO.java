@@ -14,6 +14,7 @@ import javax.validation.constraints.NotBlank;
 @Builder
 @Data
 public class BookDTO {
+
     @EqualsAndHashCode.Include
     private Long id;
     @NotBlank

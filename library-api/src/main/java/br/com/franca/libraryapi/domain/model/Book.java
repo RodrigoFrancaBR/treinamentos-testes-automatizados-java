@@ -20,9 +20,10 @@ import javax.validation.constraints.NotBlank;
 @Data
 @Entity
 public class Book {
-    @EqualsAndHashCode.Include
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private Long id;
     private String title;
     private String author;

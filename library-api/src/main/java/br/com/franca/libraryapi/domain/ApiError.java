@@ -25,4 +25,8 @@ public class ApiError {
     public ApiError(MessageError messageError) {
         this.errors = Arrays.asList(messageError);
     }
+
+    public ApiError(MessageError... elements) {
+        this.errors = Arrays.stream(elements).collect(Collectors.toList());
+    }
 }

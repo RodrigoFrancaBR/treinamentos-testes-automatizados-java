@@ -1,7 +1,9 @@
 package br.com.franca.libraryapi.domain;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor
 @Data
 public class MessageError {
 

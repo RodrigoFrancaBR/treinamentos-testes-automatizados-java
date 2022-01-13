@@ -15,7 +15,4 @@ public class MessageError {
         this.message = message;
     }
 
-    public MessageError(String messageError) {
-        this.message = messageError;
-    }
 }

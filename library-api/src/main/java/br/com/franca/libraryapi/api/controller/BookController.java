@@ -27,6 +27,7 @@ public class BookController {
     public ResponseEntity<Void> save(@RequestBody @Valid BookDTO dto) {
 
         BookDTO savedBook = bookService.save(dto);
+
         URI location
                 = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")

@@ -26,12 +26,12 @@ public class BookController {
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Void> save(@RequestBody @Valid BookDTO dto) {
 
-        BookDTO savedBook = bookService.save(dto);
+        Long savedBookID = bookService.save(dto);
 
         URI location
                 = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
-                .buildAndExpand(savedBook.getId())
+                .buildAndExpand(savedBookID)
                 .toUri();
         return ResponseEntity.created(location).build();
     }

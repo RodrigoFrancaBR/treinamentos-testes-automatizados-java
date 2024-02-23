@@ -22,23 +22,24 @@ public class BookService implements IBookService {
     private final IBookRepository repository;
 
     @Override
-    public BookDTO save(BookDTO dto) {
+    public Long save(BookDTO dto) {
+        dto.setTitle("");
+        dto.setAuthor("");
 
-        validator
-                .validate(dto).stream().findFirst()
+        validator.validate(dto).stream()
+                .findFirst()
                 .ifPresent((e) -> {
                     throw new ValidationException("O " + e.getPropertyPath() + e.getMessage());
                 });
 
+        repository.existsByIsbn(dto.getIsbn())
+                .ifPresent((e) -> {
+                    throw new BusinessException("The field isbn already registered");
+                });
+
         Book book = mapper.map(dto, Book.class);
 
-        if (repository.existsByIsbn(book.getIsbn())) {
-            throw new BusinessException("The field isbn already registered");
-        }
-
-        Book savedBook = repository.save(book);
-
-        return mapper.map(savedBook, BookDTO.class);
-
+        return repository.save(book).getId();
     }
+
 }

@@ -39,8 +39,8 @@ import java.util.List;
 @ExtendWith(SpringExtension.class)
 public class BookControllerTest {
 
-    static String URI = "/api/books";
 
+    static final String URI = "/api/books";
     @Autowired
     MockMvc mockMvc;
 
@@ -53,16 +53,16 @@ public class BookControllerTest {
     @Test
     @DisplayName("Should save book when is valid")
     void save_shouldSaveBookWhenIsValid() throws Exception {
-
         var bookDTORequest = MockHelper.oneBookDTO();
-
         var request = MockHelper.of(bookDTORequest);
 
         BDDMockito.given(bookService.save(Mockito.any(BookDTO.class)))
-                .willReturn(MockHelper.savedBookDTO());
+                .willReturn(Mockito.anyLong());
 
         var requestBuilder = getRequestBuilder(request);
 
+
+        // não guardar o retorno na var response, mas sim fazer as assertions direto no perform!!
         var response = mockMvc.perform(requestBuilder).andReturn().getResponse();
 
         Assertions.assertThat(response.getStatus()).isEqualTo(HttpStatus.CREATED.value());
@@ -84,7 +84,7 @@ public class BookControllerTest {
     @DisplayName("Should throw exception when is invalid book")
     public void save_shouldThrowExceptionWhenIsInvalidBook() throws Exception {
 
-        String request = MockHelper.of(new BookDTO());
+        var request = MockHelper.of(new BookDTO());
 
         var apiErrorExpected = new ValidationErrorAPI(
                 Arrays.asList(

@@ -1,8 +1,6 @@
 package br.com.franca.libraryapi.api.service;
 
 import br.com.franca.libraryapi.api.helper.MockHelper;
-import br.com.franca.libraryapi.config.ValidatorConfig;
-import br.com.franca.libraryapi.domain.MessageError;
 import br.com.franca.libraryapi.domain.model.Book;
 import br.com.franca.libraryapi.dtos.BookDTO;
 import br.com.franca.libraryapi.exception.BusinessException;
@@ -13,7 +11,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.BDDMockito;
 import org.mockito.Mockito;
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -48,80 +45,44 @@ public class BookServiceTest {
     @Test
     public void save_shouldSaveBookWhenIsValid() {
 
-        BookDTO bookDTO = MockHelper.oneBookDTO();
+        var bookDTO = MockHelper.oneBookDTO();
 
-        // ver sobre o doNothing()
-        // doNothing().when(validator).validate(Mockito.any(BookDTO.class));
+        Mockito.doNothing().when(validator).validate(Mockito.any(BookDTO.class));
 
-        Book bookMapper = MockHelper.oneBook();
-        BDDMockito.when(mapper.map(bookDTO, Book.class)).thenReturn(bookMapper);
+        // ver o que eh melhor fazer nada ou chamar o metodo real
+        // BDDMockito.when(validator.validate(Mockito.any(BookDTO.class)))
+        //             .thenCallRealMethod();
 
-        BDDMockito.when(repository.existsByIsbn(anyString())).thenReturn(Boolean.FALSE);
+        Mockito.doNothing().when(repository).existsByIsbn(Mockito.anyString());
 
-        Book savedBook = MockHelper.savedBook();
-        BDDMockito.when(repository.save(any(Book.class))).thenReturn(savedBook);
+        var bookMapper = MockHelper.oneBook();
+        Mockito.when(mapper.map(bookDTO, Book.class)).thenReturn(bookMapper);
 
-        BookDTO saveDTOMapper = MockHelper.savedBookDTO();
-        BDDMockito.when(mapper.map(savedBook, BookDTO.class)).thenReturn(saveDTOMapper);
+        var savedBook = MockHelper.savedBook();
+        Mockito.when(repository.save(any(Book.class))).thenReturn(savedBook);
 
-        BookDTO saveDTO = bookService.save(bookDTO);
+        var savedBookID = bookService.save(bookDTO);
 
-        Assertions.assertThat(saveDTO.getId()).isNotNull();
-        Assertions.assertThat(saveDTO.getTitle()).isEqualTo(bookDTO.getTitle());
-        Assertions.assertThat(saveDTO.getAuthor()).isEqualTo(bookDTO.getAuthor());
-        Assertions.assertThat(saveDTO.getIsbn()).isEqualTo(bookDTO.getIsbn());
+        Assertions.assertThat(savedBookID).isNotNull();
 
         Mockito.verify(validator, Mockito.times(1))
                 .validate(any(BookDTO.class));
 
-        Mockito.verify(mapper, Mockito.times(1))
-                .map(bookDTO, Book.class);
-
         Mockito.verify(repository, Mockito.times(1))
                 .existsByIsbn(anyString());
-
-        Mockito.verify(repository, Mockito.times(1))
-                .save(any(Book.class));
-
-        Mockito.verify(mapper, Mockito.times(1))
-                .map(savedBook, BookDTO.class);
-
-    }
-
-    @DisplayName("Should throw exception when isbn already registered")
-    @Test
-    public void save_shouldThrowExceptionWhenIsbnAlreadyRegistered() {
-        BookDTO bookDTO = MockHelper.oneBookDTO();
-
-        // ver sobre o doNothing()
-        //  doNothing().when(validator).validate(Mockito.any(BookDTO.class));
-
-        Book bookMapper = MockHelper.oneBook();
-        BDDMockito.when(mapper.map(bookDTO, Book.class)).thenReturn(bookMapper);
-
-        BDDMockito.when(repository.existsByIsbn(anyString())).thenReturn(Boolean.TRUE);
-
-        Assertions.assertThatExceptionOfType(BusinessException.class)
-                .isThrownBy(() -> bookService.save(bookDTO))
-                .withMessage("The field isbn already registered");
 
         Mockito.verify(mapper, Mockito.times(1))
                 .map(bookDTO, Book.class);
 
         Mockito.verify(repository, Mockito.times(1))
-                .existsByIsbn(anyString());
-
-        Mockito.verify(repository, Mockito.never())
                 .save(any(Book.class));
 
-        Mockito.verify(mapper, Mockito.never())
-                .map(MockHelper.oneBook(), BookDTO.class);
     }
 
     @DisplayName("Should throw exception when title is blank")
     @Test
     public void save_shouldThrowExceptionWhenTitleIsBlank() {
-        String messageError = "O title não deve estar em branco";
+        var messageError = "O title não deve estar em branco";
 
         var bookDTO = MockHelper.oneBookDTO();
         bookDTO.setTitle("");
@@ -136,18 +97,56 @@ public class BookServiceTest {
         Mockito.verify(validator, Mockito.times(1))
                 .validate(Mockito.any(BookDTO.class));
 
+        Mockito.verify(repository, Mockito.never())
+                .existsByIsbn(anyString());
+
         Mockito.verify(mapper, Mockito.never())
                 .map(bookDTO, Book.class);
 
         Mockito.verify(repository, Mockito.never())
+                .save(any(Book.class));
+
+    }
+
+    @DisplayName("Should throw exception when isbn already registered")
+    @Test
+    public void save_shouldThrowExceptionWhenIsbnAlreadyRegistered() {
+
+        var messageError = "The field isbn already registered";
+
+        var bookDTO = MockHelper.oneBookDTO();
+
+        doNothing().when(validator).validate(Mockito.any(BookDTO.class));
+
+        Mockito.doThrow(new BusinessException(messageError))
+                .when(repository)
+                .existsByIsbn(Mockito.anyString());
+
+        Assertions.assertThatExceptionOfType(BusinessException.class)
+                .isThrownBy(() -> bookService.save(bookDTO))
+                .withMessage(messageError);
+
+        // outra forma de fazer o codigo acima
+
+//        BusinessException exception =
+//                assertThrows(BusinessException.class, () -> bookService.save(bookDTO));
+//
+//        assertThat(exception.getMessage()).isEqualTo("The field isbn already registered");
+
+        Mockito.verify(validator, Mockito.times(1))
+                .validate(bookDTO, Book.class);
+
+        Mockito.verify(repository, Mockito.times(1))
                 .existsByIsbn(anyString());
+
+        Mockito.verify(mapper, Mockito.never())
+                .map(bookDTO, Book.class);
 
         Mockito.verify(repository, Mockito.never())
                 .save(any(Book.class));
 
-        Mockito.verify(mapper, Mockito.never())
-                .map(MockHelper.oneBook(), BookDTO.class);
     }
+
 
     /**
      * Adicionar os demais métodos do CRUD
